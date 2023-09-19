@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        /* Стили для выделения четных и нечетных элементов */
+        .even {
+            background-color: lightblue;
+        }
+
+        .odd {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <h1>Todo List</h1>
+    <input type="text" id="taskInput" placeholder="Добавить новую задачу">
+    <button onclick="addTask()">Добавить</button>
+    <button onclick="highlightEven()">Выделить четные</button>
+    <button onclick="highlightOdd()">Выделить нечетные</button>
+    <button onclick="deleteLast()">Удалить последний</button>
+    <button onclick="deleteFirst()">Удалить первый</button>
+    <button onclick="completeTask()">Complete</button>
+
+    <ul id="taskList">
+        <!-- Список задач будет здесь -->
+    </ul>
+
+    <script>
+        // Функция для добавления новой задачи
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput.value.trim();
+
+            if (taskText === '') {
+                return;
+            }
+
+            const taskList = document.getElementById('taskList');
+            const li = document.createElement('li');
+            li.textContent = taskText;
+            taskList.appendChild(li);
+
+            taskInput.value = '';
+            saveTasksToLocalStorage();
+        }
+
+        // Функция для сохранения задач в локальном хранилище
+        function saveTasksToLocalStorage() {
+            const taskList = document.getElementById('taskList');
+            const tasks = [];
+            for (const li of taskList.children) {
+                tasks.push(li.textContent);
+            }
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Функция для загрузки задач из локального хранилища
+        function loadTasksFromLocalStorage() {
+            const taskList = document.getElementById('taskList');
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            for (const taskText of tasks) {
+                const li = document.createElement('li');
+                li.textContent = taskText;
+                taskList.appendChild(li);
+            }
+        }
+
+        loadTasksFromLocalStorage();
+
+        // Функция для выделения четных элементов
+        function highlightEven() {
+            const taskList = document.getElementById('taskList');
+            for (let i = 0; i < taskList.children.length; i++) {
+                if (i % 2 === 0) {
+                    taskList.children[i].classList.add('even');
+                } else {
+                    taskList.children[i].classList.remove('even');
+                }
+            }
+        }
+
+        // Функция для выделения нечетных элементов
+        function highlightOdd() {
+            const taskList = document.getElementById('taskList');
+            for (let i = 0; i < taskList.children.length; i++) {
+                if (i % 2 !== 0) {
+                    taskList.children[i].classList.add('odd');
+                } else {
+                    taskList.children[i].classList.remove('odd');
+                }
+            }
+        }
+
+        // Функция для удаления последнего элемента
+        function deleteLast() {
+            const taskList = document.getElementById('taskList');
+            if (taskList.children.length > 0) {
+                taskList.removeChild(taskList.lastChild);
+                saveTasksToLocalStorage();
+            }
+        }
+
+        // Функция для удаления первого элемента
+        function deleteFirst() {
+            const taskList = document.getElementById('taskList');
+            if (taskList.children.length > 0) {
+                taskList.removeChild(taskList.firstChild);
+                saveTasksToLocalStorage();
+            }
+        }
+
+        // Функция для завершения задачи и перемещения в конец списка
+        function completeTask() {
+            const taskList = document.getElementById('taskList');
+            if (taskList.children.length > 0) {
+                const firstTask = taskList.firstChild;
+                firstTask.classList.add('completed');
+                taskList.removeChild(firstTask);
+                taskList.appendChild(firstTask);
+                saveTasksToLocalStorage();
+            }
+        }
+    </script>
+</body>
+</html>
